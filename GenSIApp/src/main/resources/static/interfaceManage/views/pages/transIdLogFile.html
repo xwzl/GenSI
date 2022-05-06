@@ -1,0 +1,77 @@
+<meta charset="UTF-8">
+<div class="row">
+    <div class="col-sm-4 col-md-4">
+        <form class="form-inline">
+            <div class="form-group">
+                <label for="transId">transId:</label>
+                <input type="text" ng-model="transId" class="form-control" id="transId" style="width:300px"
+                       placeholder="输入要查询的transId">
+            </div>
+            <button type="button" class="btn btn-success" ng-click="getDataList()">查 询</button>
+        </form>
+        <div class="table-responsive">
+            <table id="orderTable" class="table table-condensed table-hover">
+                <thead>
+                <tr>
+                    <th style="word-break: keep-all; white-space: nowrap;">日志文件名(默认取最近100条);文件目录:<font color="red">{{ logPath }}</font></th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr ng-repeat="item in dataList" ng-click="showDetail(item)">
+                    <td>{{ item.transIdLogFileName }}</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="col-sm-8 col-md-8">
+        <p class="text-primary">文件路径: {{ selectedData.transIdLogFilePath }}</p>
+        <textarea class="form-control" readonly="readonly" rows="40" spellcheck="false">{{ selectedData.transIdLogFileContent }}</textarea>
+    </div>
+</div>
+<script type="text/javascript">
+    var pageload = function () {
+        $scope.dataList = [];
+        $scope.selectedData = {};
+        $scope.logPath = "";
+        $scope.showDetail = function (item) {
+            $scope.selectedData = item;
+            $.ajax({
+                "url": "/sysManage/getTransIdLogFileContent",
+                "type": "POST",
+                "dataType": "json",
+                "data": {
+                    "transIdLogFilePath": $scope.selectedData.transIdLogFilePath,
+                    "transIdLogFileName": $scope.selectedData.transIdLogFileName
+                },
+                "success": function (response) {
+                    $scope.selectedData = response.data;
+                    $scope.$apply();
+                }
+            });
+        };
+
+        $scope.getDataList = function () {
+            $.ajax({
+                "url": "/sysManage/getTransIdLogFiles",
+                "type": "POST",
+                "dataType": "json",
+                "data": {
+                    "transId": $scope.transId
+                },
+                "success": function (response) {
+                	if(response.code && "1"==response.code){
+	                    $scope.dataList = response.data;
+	                    $scope.logPath = response.logPath;
+	                    $scope.$apply();
+                	}else{
+                		$scope.dataList = {};
+                		swalerror(response.desc,"GenSI");                		
+                	}
+                }
+            });
+        };
+
+        $scope.getDataList();
+    }
+</script>

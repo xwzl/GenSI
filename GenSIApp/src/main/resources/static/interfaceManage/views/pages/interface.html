@@ -1,0 +1,210 @@
+<meta charset="UTF-8">
+<div class="row">
+	<div class="col-lg-12">
+		<div class="ibox float-e-margins">
+			<div class="ibox-title">
+				<h5>外部系统列表</h5><br />
+				</font>
+			</div>
+			<div class="ibox-content">
+				<div ng-repeat="sysInfo in allsys track by $index" class="infont col-md-3 col-sm-4">
+					<a href="javascript:void(0)" ng-click="showSysInfo(sysInfo)"><i class="fa fa-laptop fa-5x"></i><br />{{ sysInfo.sysname}}</a>
+				</div>
+				<div class="infont col-md-3 col-sm-4">
+					<a href="javascript:void(0)" ng-click="showSysModal()"><i
+						class="fa fa-times-circle fa-5x fa-spin"></i><br />添加外部系统</a>
+				</div>
+				<br />&nbsp;<br />&nbsp;<br />&nbsp;<br />&nbsp;<br />&nbsp;<br />&nbsp;
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="row">
+	<div class="col-lg-12">
+		<div class="ibox float-e-margins">
+			<div class="ibox-title">
+				<h5>接口配置说明：</h5>
+			</div>
+			<div class="ibox-content">
+				<ul>
+					<li>目前与本配置相关的有两个接口 第一版接口 /genSI/gsInterface 第二版接口 /genSI/gsInterfaceV2</li>
+					<li>接口实现采用同步异步相结合的方式。 客户端请求过来， 同步返回请求接收的情况，具体业务信息异步方式往外围系统提供的地址进行推送。</li>
+				</ul><hr /><ul>	
+					<li>第一版接口 /genSI/gsInterface 配置说明：</li>
+					<li>接口通过http直接访问，可通过swagger-ui直接调用。报文未加密。只利用第一部分参数，确认消息异步推送的目的。</li>
+				</ul><hr /><ul>
+					<li>第二版接口 /genSI/gsInterfaceV2 配置说明：</li>
+					<li>接口通过提供的客户端程序访问。AES对称加密结合RSA非对称加密，对客户请求的报文进行单向加密</li>
+					<li>第三方系统接入，需预先维护好系统信息。由第三方系统提供消息推送路径，消息推送参数，同时将系统ID，系统用户名，系统用户密码，系统公钥 主动提供给第三方系统</li>
+					<li>将<a href="ftoulClient-0.0.1.jar">客户端jar</a>，<a href="InterFaceDemo.java">接口调用示例代码</a> 一并提供给第三方系统，第三方通过示例代码方式调用接口。</li>
+				</ul>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="modal inmodal fade" id="sysModal" role="dialog"
+	aria-hidden="true">
+	<div class="modal-dialog modal-lg">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal">
+					<span aria-hidden="true">&times;</span><span class="sr-only">关闭</span>
+				</button>
+				<h4 class="modal-title">外围交互系统</h4>
+			</div>
+			<div class="modal-body">
+				<div class="input-group">
+					<span class="input-group-addon">系统ID:*</span> <span
+						style="position: relative; z-index: 9999;"> <input
+						type="text" class="form-control" placeholder="系统ID"
+						ng-model="sys.sysid" />
+					</span>
+				</div>
+				<div class="input-group">
+					<span class="input-group-addon">系统名称:*</span> <input type="text"
+						class="form-control" ng-model="sys.sysname" />
+				</div>
+				<div class="input-group">
+					<span class="input-group-addon">消息推送路径:*</span> <input type="text"
+						class="form-control" ng-model="sys.notifyurl" />
+				</div>
+				<div class="input-group">
+					<span class="input-group-addon">消息推送参数:</span> <input type="text"
+						class="form-control" ng-model="sys.notifyparam" />
+				</div>
+				<hr />
+				<div class="input-group">
+					<span class="input-group-addon">系统用户名:</span> <input type="text"
+						class="form-control" ng-model="sys.username" />
+				</div>
+				<div class="input-group">
+					<span class="input-group-addon">系统用户密码:</span> <input type="password"
+						class="form-control" ng-model="sys.pwd" />
+				</div>
+				<div class="input-group">
+					<span class="input-group-addon">系统IP白名单:</span> <input type="text"
+						class="form-control" ng-model="sys.authedip" />
+				</div>
+				<div class="input-group media-body">
+					<span>系统私钥:</span>
+					<div class="well">{{sys.privatekey}}</div>
+				</div>
+				<div class="input-group media-body">
+					<span>系统公钥:</span>
+					<div class="well">{{sys.publickey}}</div>
+				</div>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-white" data-dismiss="modal">关闭</button>
+				<button type="button" class="btn btn-primary" ng-if="sys.sysid && sys.sysname && sys.notifyurl"
+					ng-click="addSys()">确定</button>
+				<button type="button" class="btn btn-primary" ng-if="sys.sysid" ng-click="deleteSys()">删除</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="modal inmodal fade" id="passModal" role="dialog"
+	aria-hidden="true">
+	<div class="modal-dialog modal-md">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h4 class="modal-title" ng-if="!order.orderId" )>输入访问秘钥</h4>
+			</div>
+			<div class="modal-body">
+				<div class="input-group">
+					<span class="input-group-addon">输入访问秘钥：</span> <input type="text"
+						class="form-control" ng-model="passKey" />
+				</div>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-primary" ng-if="passKey"
+					ng-click="confirmKey()">确定</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script>
+
+var loadData = function(){
+	$http.post("/sysManage/querySys",{}).success(function(res){
+		if(typeof(res)=="object"){
+			$scope.allsys = res;	
+		}else{
+			toastr.error("数据加载出错，请查看后台日志", "GenSI");
+		}
+	})
+}
+
+var pageload = function(){
+	$('#passModal').modal({backdrop: 'static', keyboard: false});
+	//loadData();
+	$("#passModal").modal("show");
+	$scope.showSysModal = function(){
+		$scope.sys = {};
+		$("#sysModal").modal("show");
+	}
+	$scope.addSys = function(){
+		$.ajax({
+	        url: "/sysManage/newSys",
+	        type: "POST",
+	        contentType : 'application/json;charset=utf-8', //设置请求头信息
+	        dataType:"json",
+	        data: JSON.stringify($scope.sys),            //将Json对象序列化成Json字符串，toJSON()需要引用jquery.json.min.js
+	        success: function(response){
+					if(!response.code){
+						toastr.warning('更新失败', 'GenSI');
+					}else if(response.code>0){
+						toastr.success(response.desc, "GenSI");
+					}else{
+						toastr.error(response.desc, "GenSI");
+					}
+					$scope.sys = {};
+					//使用JS修改Angularjs作用域的变量时，需要调用下$apply()方法，传播当前的变化，更新数据的双向绑定。用$http默认就会自己传播。
+					$scope.$apply();
+					$("#sysModal").modal("hide");
+					loadData();
+	        }
+		})
+	}
+	$scope.deleteSys = function(){
+		swal({
+			title:"删除系统",
+			text:"目前系统删除后无法恢复，确认要删除该外围系统吗？ ",
+			type: "warning",
+	        showCancelButton: true,
+	        cancelButtonText:"关闭",
+	        confirmButtonColor: "#DD6B55",
+	        confirmButtonText: "确认",
+	        closeOnConfirm: true
+		},function(){
+			$http.post("/sysManage/deleteSys",{"sysId":$scope.sys.sysid})
+			.success(function(data){
+				swalsucc("成功删除"+data+"个外围系统","GenSI");
+				// $scope.queryOrder();
+				loadData();
+			})
+		})
+	}
+	
+	$scope.showSysInfo = function(sysInfo){
+		$scope.sys=sysInfo;
+		$("#sysModal").modal("show");
+	}
+	
+	$scope.confirmKey = function(){
+		$http.post("/sysManage/passKey",{"passKey":$scope.passKey})
+		.success(function(res){
+			if(res && res.result=="0"){
+				$("#passModal").modal("hide");
+				loadData();
+			}else{
+				toastr.error("请不要非法访问", "GenSI");
+			}
+		})
+	}
+}
+</script>

@@ -1,0 +1,73 @@
+<meta charset="UTF-8">
+<div class="row">
+    <div class="col-sm-12 col-md-12">
+        <form class="form-inline">
+            <div class="form-group">
+                <label for="transId">transId:</label>
+                <input type="text" ng-model="transId" class="form-control" id="transId" style="width:300px"
+                       placeholder="输入要查询的transId">
+            </div>
+            <div class="form-group">
+                <label for="serviceCode">serviceCode:</label>
+                <input type="text" ng-model="serviceCode" class="form-control" style="width:300px" id="serviceCode"
+                       placeholder="输入要查询的serviceCode">
+            </div>
+            <button type="button" class="btn btn-success" ng-click="getHistory()">查 询</button>
+        </form>
+    </div>
+</div>
+<div class="row">
+    <div class="col-sm-12 col-md-12">
+        <div class="table-responsive">
+            <table id="orderTable" class="table table-striped table-condensed">
+                <thead>
+                <tr>
+                    <th>序号</th>
+                    <th style="word-break: keep-all; white-space: nowrap;">transId</th>
+                    <th style="word-break: keep-all; white-space: nowrap;">reqBody</th>
+                    <th style="word-break: keep-all; white-space: nowrap;">rspBody</th>
+                    <th style="word-break: keep-all; white-space: nowrap;">intime</th>
+                    <th style="word-break: keep-all; white-space: nowrap;">serviceCode</th>
+                    <th style="word-break: keep-all; white-space: nowrap;">操作</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr ng-repeat="item in histories">
+                    <td>{{ $index + 1 }}</td>
+                    <td>{{ item.transid }}</td>
+                    <td>{{ item.reqbody | limitTo:50 }}</td>
+                    <td>{{ item.rspbody | limitTo:50 }}</td>
+                    <td>{{ item.intime }}</td>
+                    <td>{{ item.servicecode }}</td>
+                    <td><a ng-click="showHistoryDetail(item)" data-toggle="modal" data-target="#myModal">查看详情</a></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                        aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">调用详情</h4>
+            </div>
+            <div class="modal-body">
+                <h4 style="color:blue">transId:</h4>
+                <input type="text" class="form-control" value="{{ selectedHistory.transid }}">
+                <h4 style="color:blue">serviceCode:</h4>
+                <input type="text" class="form-control" value="{{ selectedHistory.servicecode }}">
+                <h4 style="color:blue">reqBody(请求报文):</h4>
+                <textarea class="form-control" rows="8" spellcheck="false">{{ selectedHistory.reqbody }}</textarea>
+                <h4 style="color:blue">rspBody:(响应报文):</h4>
+                <textarea class="form-control" rows="15" spellcheck="false">{{ selectedHistory.rspbody }}</textarea>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="js/history.js"></script>
